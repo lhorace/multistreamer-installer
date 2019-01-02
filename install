@@ -137,7 +137,7 @@ MISC_LOGFILE=$(mktemp)
 printf "Cloning/updating setup-openresty script (details in ${MISC_LOGFILE})\n" | tee -a $MISC_LOGFILE
 if ! test -d /opt/setup-openresty ; then
   git clone https://github.com/lhorace/setup-openresty.git /opt/setup-openresty >> $MISC_LOGFILE 2>&1
-  git checkout personal >> $MISC_LOGFILE 2>&1
+  git checkout support_ubuntu1804 >> $MISC_LOGFILE 2>&1
 else
   pushd /opt/setup-openresty
   git pull origin master >> $MISC_LOGFILE 2>&1
