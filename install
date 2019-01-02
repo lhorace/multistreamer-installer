@@ -144,7 +144,7 @@ if ! test -d /opt/setup-openresty ; then
   cd $OLDPWD
 else
   pushd /opt/setup-openresty
-  git pull origin master >> $MISC_LOGFILE 2>&1
+  git pull >> $MISC_LOGFILE 2>&1
   popd
 fi
 
