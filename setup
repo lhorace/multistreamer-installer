@@ -145,7 +145,7 @@ mkdir -p /etc/ssl/certs
 
 chown -R www-data:www-data /etc/ssl/certs
 
-printf "## Generating temporary self-signed certificate\n" | tee -a $LOGFILE
+printf "## Generating self-signed certificate\n" | tee -a $LOGFILE
 if ! test -e /etc/ssl/certs/fullchain.pem ; then
   # generate a temporary self-signed cert so nginx doesn't complain
   sudo -u www-data openssl req -new \
