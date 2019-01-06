@@ -584,26 +584,6 @@ if test ${POSTGRES_AUTH_USERCOUNT} -eq 0 ; then
   fi
 fi
 
-printf "## Generating script to auto-renew Let's Encrypt certs...\n" | tee -a $LOGFILE
-cat <<EOF >/etc/cron.daily/update-letsencrypt-certs
-#!/usr/bin/env bash
-set -e
-
-sudo -u www-data /opt/dehydrated/dehydrated -c >/dev/null 2>&1
-
-if test /etc/ssl/certs/fullchain.pem -nt /etc/ssl/certs/combined.pem ; then
-  cat /etc/ssl/certs/fullchain.pem \
-      /etc/ssl/certs/privkey.pem > \
-      /etc/ssl/certs/combined.pem
-  systemctl reload nginx.service haproxy.service
-fi
-EOF
-
-chmod +x /etc/cron.daily/update-letsencrypt-certs
-
-printf "## Getting Let's Encrypt certificates...\n" | tee -a $LOGFILE
-/etc/cron.daily/update-letsencrypt-certs >>$LOGFILE 2>&1
-
 multistreamer -e production initdb >>$LOGFILE 2>&1 || true
 
 printf "## Enabling and starting sockexec, postgres-auth-server, multistreamer...\n" | tee -a $LOGFILE
