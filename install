@@ -78,7 +78,7 @@ fi
 if test "${DISTRO}" = "ubuntu"; then
   UPDATE_CMD="apt-get update"
   INSTALL_CMD="apt-get install -y"
-  PACKAGE_LIST="git ffmpeg libyaml-dev"
+  PACKAGE_LIST="git ffmpeg libyaml-dev lua luarocks"
 
 elif test "${DISTRO}" = "debian" ; then
   UPDATE_CMD="apt-get update"
@@ -138,7 +138,7 @@ printf "Cloning/updating setup-openresty script (details in ${MISC_LOGFILE})\n" 
 if ! test -d /opt/setup-openresty ; then
   git clone https://github.com/lhorace/setup-openresty.git /opt/setup-openresty >> $MISC_LOGFILE 2>&1
   cd /opt/setup-openresty
-  git checkout support_ubuntu1804 >> $MISC_LOGFILE 2>&1
+  git checkout personal >> $MISC_LOGFILE 2>&1
   # To potentially not break anything
   # Change back to old dir!
   cd $OLDPWD
