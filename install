@@ -185,11 +185,12 @@ fi
 
 printf "Cloning/updating multistreamer...\n" | tee -a $MISC_LOGFILE
 if ! test -d /opt/multistreamer ; then
-  git clone https://github.com/jprjr/multistreamer.git /opt/multistreamer >> $MISC_LOGFILE 2>&1
+  git clone https://github.com/lhorace/multistreamer.git /opt/multistreamer >> $MISC_LOGFILE 2>&1
+  pushd /opt/multistreamer
+  git checkout personal >> $MISC_LOGFILE 2>&1
 else
   pushd /opt/multistreamer
-  git fetch --tags origin >> $MISC_LOGFILE 2>&1
-  git checkout $(git describe --tags --abbrev=0) >> $MISC_LOGFILE 2>&1
+  git checkout personal >> $MISC_LOGFILE 2>&1
   popd
 fi
 
@@ -200,8 +201,9 @@ popd
 
 printf "Installing Lua modules for multistreamer...(see $MISC_LOGFILE)\n" | tee -a $MISC_LOGFILE
 pushd /opt/multistreamer
-$LUAROCKS --tree=lua_modules install --only-deps /opt/multistreamer/rockspecs/multistreamer-dev-1.rockspec >> $MISC_LOGFILE 2>&1
-$LUAROCKS --tree=lua_modules install md5 >> $MISC_LOGFILE 2>&1
+$LUAROCKS --tree=lua_modules install --only-deps /opt/multistreamer/rockspecs/multistreamer-12.2.0-0.rockspec >> $MISC_LOGFILE 2>&1
+# Already required in rockspec!
+#$LUAROCKS --tree=lua_modules install md5 >> $MISC_LOGFILE 2>&1
 popd
 
 cat > /usr/local/bin/postgres-auth-server <<EOF
