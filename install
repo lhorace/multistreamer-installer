@@ -78,7 +78,7 @@ fi
 if test "${DISTRO}" = "ubuntu"; then
   UPDATE_CMD="apt-get update"
   INSTALL_CMD="apt-get install -y"
-  PACKAGE_LIST="git ffmpeg libyaml-dev"
+  PACKAGE_LIST="git ffmpeg libyaml-dev lua5.2 luarocks"
 
 elif test "${DISTRO}" = "debian" ; then
   UPDATE_CMD="apt-get update"
@@ -138,13 +138,13 @@ printf "Cloning/updating setup-openresty script (details in ${MISC_LOGFILE})\n" 
 if ! test -d /opt/setup-openresty ; then
   git clone https://github.com/lhorace/setup-openresty.git /opt/setup-openresty >> $MISC_LOGFILE 2>&1
   cd /opt/setup-openresty
-  git checkout support_ubuntu1804 >> $MISC_LOGFILE 2>&1
+  git checkout personal >> $MISC_LOGFILE 2>&1
   # To potentially not break anything
   # Change back to old dir!
   cd $OLDPWD
 else
   pushd /opt/setup-openresty
-  git pull origin master >> $MISC_LOGFILE 2>&1
+  git pull >> $MISC_LOGFILE 2>&1
   popd
 fi
 
@@ -157,7 +157,8 @@ pushd /opt/setup-openresty
   --with-stream-ssl
 popd
 
-LUAROCKS=/opt/openresty-rtmp/bin/luarocks
+# This fixes building lua modules, specify lua dir!
+LUAROCKS="/opt/openresty-rtmp/bin/luarocks --lua-dir=/opt/openresty-rtmp/luajit"
 
 if ! test -f /opt/sockexec-${SOCKEXEC_VERSION}.tar.gz ; then
   printf "Downloading sockexec...\n" | tee -a $MISC_LOGFILE
