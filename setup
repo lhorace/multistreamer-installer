@@ -6,13 +6,7 @@ if test "$(id -u)" != "0" ; then
   exit 1
 fi
 
-domain=$1
-
-if test -z "${domain}" ; then
-  printf "Usage: $0 <domain-name>\n"
-  printf "  domain will be used for Let's Encrypt certificates\n"
-  exit 1
-fi
+domain=localhost.localdomain
 
 printf "WARNING: this script is meant for doing a from-scratch install\n"
 printf "of multistreamer to a brand-new server. If you want to just\n"
@@ -147,54 +141,23 @@ ${INSTALL_CMD} ${PACKAGE_LIST} >> $LOGFILE 2>&1
 printf "## Installing multistreamer, sockexec, and postgres-auth-server...\n" | tee -a $LOGFILE
 ./install 2>&1 | tee -a $LOGFILE
 
-printf "## Installing/updated dehydrated...\n" | tee -a $LOGFILE
-if ! test -d /opt/dehydrated ; then
-  git clone https://github.com/lukas2511/dehydrated.git /opt/dehydrated >>$LOGFILE 2>&1
-else
-  pushd /opt/dehydrated >/dev/null 2>&1
-  git fetch --tags origin >>$LOGFILE 2>&1
-  popd >/dev/null 2>&1
-fi
+mkdir -p /etc/ssl/certs
 
-pushd /opt/dehydrated >/dev/null 2>&1
-git checkout $(git describe --tags --abbrev=0) >>$LOGFILE 2>&1
-popd >/dev/null 2>&1
-
-mkdir -p /var/www/wellknown
-mkdir -p /etc/dehydrated
-
-printf "WELLKNOWN=/var/www/wellknown\n" > /etc/dehydrated/config
-printf "$domain\n" > /etc/dehydrated/domains.txt
-
-chown -R www-data:www-data /var/www/wellknown
-chown -R www-data:www-data /etc/dehydrated
-
-printf "## Registering with Let's Encrypt\n" | tee -a $LOGFILE
-if ! test -d /etc/dehydrated/accounts ; then
-  sudo -u www-data /opt/dehydrated/dehydrated --register --accept-terms >>$LOGFILE 2>&1
-fi
-
-if ! test -d /etc/dehydrated/certs ; then
-  sudo -u www-data mkdir /etc/dehydrated/certs
-fi
-
-if ! test -d /etc/dehydrated/certs/$domain ; then
-  sudo -u www-data mkdir /etc/dehydrated/certs/$domain
-fi
+chown -R www-data:www-data /etc/ssl/certs
 
 printf "## Generating temporary self-signed certificate\n" | tee -a $LOGFILE
-if ! test -e /etc/dehydrated/certs/$domain/fullchain.pem ; then
+if ! test -e /etc/ssl/certs/fullchain.pem ; then
   # generate a temporary self-signed cert so nginx doesn't complain
   sudo -u www-data openssl req -new \
     -subj "/CN=$domain" \
     -sha256 -newkey rsa:2048 -days 365 -nodes -x509 \
-    -keyout /etc/dehydrated/certs/$domain/privkey.pem \
-    -out /etc/dehydrated/certs/$domain/fullchain.pem >>$LOGFILE 2>&1
+    -keyout /etc/ssl/certs/privkey.pem \
+    -out /etc/ssl/certs/fullchain.pem >>$LOGFILE 2>&1
 fi
 
-cat /etc/dehydrated/certs/$domain/fullchain.pem \
-    /etc/dehydrated/certs/$domain/privkey.pem > \
-    /etc/dehydrated/certs/$domain/combined.pem
+cat /etc/ssl/certs/fullchain.pem \
+    /etc/ssl/certs/privkey.pem > \
+    /etc/ssl/certs/combined.pem
 
 rm /etc/nginx/sites-available/default
 
@@ -210,8 +173,8 @@ server {
 server {
   listen [::]:443 ssl default_server ipv6only=off;
 
-  ssl_certificate     /etc/dehydrated/certs/$domain/fullchain.pem;
-  ssl_certificate_key /etc/dehydrated/certs/$domain/privkey.pem;
+  ssl_certificate     /etc/ssl/certs/fullchain.pem;
+  ssl_certificate_key /etc/ssl/certs/privkey.pem;
   
   server_name _;
   return 444;
@@ -236,8 +199,8 @@ server {
 server {
   listen [::]:443;
 
-  ssl_certificate     /etc/dehydrated/certs/$domain/fullchain.pem;
-  ssl_certificate_key /etc/dehydrated/certs/$domain/privkey.pem;
+  ssl_certificate     /etc/ssl/certs/fullchain.pem;
+  ssl_certificate_key /etc/ssl/certs/privkey.pem;
 
   server_name $domain;
 
@@ -318,7 +281,7 @@ defaults
 	errorfile 504 /etc/haproxy/errors/504.http
 
 frontend multistreamer-irc-tls
-	bind :::6697 v4v6 ssl crt /etc/dehydrated/certs/$domain/combined.pem
+	bind :::6697 v4v6 ssl crt /etc/ssl/certs/combined.pem
 	mode tcp
         option tcplog
 	default_backend multistreamer-irc
@@ -628,10 +591,10 @@ set -e
 
 sudo -u www-data /opt/dehydrated/dehydrated -c >/dev/null 2>&1
 
-if test /etc/dehydrated/certs/$domain/fullchain.pem -nt /etc/dehydrated/certs/$domain/combined.pem ; then
-  cat /etc/dehydrated/certs/$domain/fullchain.pem \
-      /etc/dehydrated/certs/$domain/privkey.pem > \
-      /etc/dehydrated/certs/$domain/combined.pem
+if test /etc/ssl/certs/fullchain.pem -nt /etc/ssl/certs/combined.pem ; then
+  cat /etc/ssl/certs/fullchain.pem \
+      /etc/ssl/certs/privkey.pem > \
+      /etc/ssl/certs/combined.pem
   systemctl reload nginx.service haproxy.service
 fi
 EOF
