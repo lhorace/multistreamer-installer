@@ -176,7 +176,7 @@ ln -s sockexec-${SOCKEXEC_VERSION} /opt/sockexec
 
 printf "Cloning/updating postgres-auth-server...\n" | tee -a $MISC_LOGFILE
 if ! test -d /opt/postgres-auth-server ; then
-  git clone https://github.com/jprjr/postgres-auth-server.git /opt/postgres-auth-server >> $MISC_LOGFILE 2>&1
+  git clone https://github.com/lhorace/postgres-auth-server.git /opt/postgres-auth-server >> $MISC_LOGFILE 2>&1
 else
   pushd /opt/postgres-auth-server
   git pull origin master >> $MISC_LOGFILE 2>&1
