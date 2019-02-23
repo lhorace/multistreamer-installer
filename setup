@@ -6,7 +6,13 @@ if test "$(id -u)" != "0" ; then
   exit 1
 fi
 
-domain=localhost.localdomain
+domain=$1
+
+if test -z "${domain}" ; then
+  printf "Usage: $0 <domain-name>\n"
+  printf "  domain will be used for Let's Encrypt certificates\n"
+  exit 1
+fi
 
 printf "WARNING: this script is meant for doing a from-scratch install\n"
 printf "of multistreamer to a brand-new server. If you want to just\n"
