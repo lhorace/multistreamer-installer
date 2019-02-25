@@ -196,7 +196,7 @@ fi
 
 printf "Installing Lua Modules for postgres-auth-server...(see $MISC_LOGFILE)\n" | tee -a $MISC_LOGFILE
 pushd /opt/postgres-auth-server
-$LUAROCKS --tree=lua_modules install --only-deps /opt/postgres-auth-server/rockspecs/postgres-auth-server-dev-1.rockspec >> $MISC_LOGFILE 2>&1
+$LUAROCKS --tree=lua_modules install --only-deps /opt/postgres-auth-server/rockspecs/postgres-auth-server-${POSTGRES_AUTH_SERVER_VERSION}-0.rockspec >> $MISC_LOGFILE 2>&1
 popd
 
 printf "Installing Lua modules for multistreamer...(see $MISC_LOGFILE)\n" | tee -a $MISC_LOGFILE
