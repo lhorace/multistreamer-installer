@@ -177,9 +177,14 @@ ln -s sockexec-${SOCKEXEC_VERSION} /opt/sockexec
 printf "Cloning/updating postgres-auth-server...\n" | tee -a $MISC_LOGFILE
 if ! test -d /opt/postgres-auth-server ; then
   git clone https://github.com/lhorace/postgres-auth-server.git /opt/postgres-auth-server >> $MISC_LOGFILE 2>&1
+  cd /opt/postgres-auth-server
+  git checkout personal >> $MISC_LOGFILE 2>&1
+  # To potentially not break anything
+  # Change back to old dir!
+  cd $OLDPWD
 else
   pushd /opt/postgres-auth-server
-  git pull origin master >> $MISC_LOGFILE 2>&1
+  git pull >> $MISC_LOGFILE 2>&1
   popd
 fi
 
@@ -190,7 +195,7 @@ if ! test -d /opt/multistreamer ; then
   git checkout personal >> $MISC_LOGFILE 2>&1
 else
   pushd /opt/multistreamer
-  git checkout personal >> $MISC_LOGFILE 2>&1
+  git pull >> $MISC_LOGFILE 2>&1
   popd
 fi
 
