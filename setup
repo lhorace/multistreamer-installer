@@ -147,9 +147,18 @@ ${INSTALL_CMD} ${PACKAGE_LIST} >> $LOGFILE 2>&1
 printf "## Installing multistreamer, sockexec, and postgres-auth-server...\n" | tee -a $LOGFILE
 ./install 2>&1 | tee -a $LOGFILE
 
+printf "## Installing/updated dehydrated...\n" | tee -a $LOGFILE
+if ! test -d /opt/dehydrated ; then
+  git clone https://github.com/lukas2511/dehydrated.git /opt/dehydrated >>$LOGFILE 2>&1
+else
+  pushd /opt/dehydrated >/dev/null 2>&1
+  git fetch --tags origin >>$LOGFILE 2>&1
+  popd >/dev/null 2>&1
+fi
+
 mkdir -p /etc/ssl/certs
 
-chown -R www-data:www-data /etc/ssl/certs
+chown -R www-data:www-data /etc/dehydrated
 
 printf "## Generating temporary self-signed certificate\n" | tee -a $LOGFILE
 if ! test -e /etc/ssl/certs/fullchain.pem ; then
