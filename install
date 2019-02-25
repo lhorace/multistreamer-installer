@@ -159,6 +159,8 @@ popd
 
 # This fixes building lua modules, specify lua dir!
 LUAROCKS="/opt/openresty-rtmp/bin/luarocks --lua-dir=/opt/openresty-rtmp/luajit"
+# Set path to lua bin in PATH
+export PATH=/opt/openresty-rtmp/bin:${PATH}
 
 if ! test -f /opt/sockexec-${SOCKEXEC_VERSION}.tar.gz ; then
   printf "Downloading sockexec...\n" | tee -a $MISC_LOGFILE
